@@ -13,6 +13,9 @@ import org.springframework.stereotype.Repository;
 import com.javaweb.Bean.BuildingBean;
 import com.javaweb.repository.BuildingRepository;
 import com.javaweb.repository.entity.BuildingEntity;
+import com.javaweb.repository.entity.DistrictEntity;
+import com.javaweb.repository.entity.RentareaEntity;
+import com.mysql.jdbc.PreparedStatement;
 
 @Repository
 
@@ -24,10 +27,65 @@ public class BuildingRepositoryImpl implements BuildingRepository {
 
 	@Override
 	public List<BuildingEntity> findAll(BuildingBean buildingBean) {
+
+		String sql = buildQuery(buildingBean);
+
+		List<BuildingEntity> result = new ArrayList<>();
+		try (Connection conn = DriverManager.getConnection(DB_URL, USER, PASS);
+				Statement stmt = conn.createStatement();
+				ResultSet rs = stmt.executeQuery(sql);) {
+			while (rs.next()) {
+				BuildingEntity building = new BuildingEntity();
+				building.setId(rs.getInt("id"));
+				building.setName(rs.getString("name"));
+				building.setStreet(rs.getString("street"));
+				building.setWard(rs.getString("ward"));
+				building.setNumberOfBasement(rs.getInt("numberofbasement"));
+				building.setDistrictId(rs.getInt("districtid"));
+				building.setFloorArea(rs.getInt("floorarea"));
+				building.setServiceFee(rs.getString("servicefee"));
+				building.setRentPrice(rs.getInt("rentprice"));
+				building.setManagerName(rs.getString("managername"));
+				building.setManagerPhoneNumber(rs.getString("managerphonenumber"));
+				result.add(building);
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+			System.out.println("Connected database failed...");
+		}
+		return result;
+	}
+
+	@Override
+	public List<String> checkInnerJoin(BuildingBean buildingBean) {
+		List<String> innerJoin = new ArrayList<>();
+
+		if (buildingBean.getStaffId() != null) {
+			innerJoin.add(" INNER JOIN assignmentbuilding a ON a.buildingid = b.id AND a.staffid = "
+					+ buildingBean.getStaffId());
+		}
+
+		if (buildingBean.getTypecode() != null) {
+			innerJoin.add(" INNER JOIN buildingrenttype brt ON brt.buildingid = b.id");
+			innerJoin.add(" INNER JOIN renttype rt ON rt.id = brt.renttypeid");
+
+			if (buildingBean.getStaffId() == null) {
+				innerJoin.add(" WHERE 1 = 1");
+			}
+
+			for (String typeCode : buildingBean.getTypecode()) {
+				innerJoin.add(" AND rt.code LIKE '%" + typeCode + "%'");
+			}
+		}
+
+		return innerJoin;
+
+	}
+
+	public String buildQuery(BuildingBean buildingBean) {
 		StringBuilder sql = new StringBuilder("SELECT * FROM building b ");
-		
 		boolean check = false;
-		
+
 		List<String> innerJoinTable = checkInnerJoin(buildingBean);
 
 		if (innerJoinTable != null && !innerJoinTable.isEmpty()) {
@@ -38,7 +96,7 @@ public class BuildingRepositoryImpl implements BuildingRepository {
 		}
 
 		if (!check) {
-			sql.append(" where 1 = 1" + " ");
+			sql.append(" where 1 = 1 ");
 		}
 
 		if (buildingBean.getName() != null && !buildingBean.getName().equals("")) {
@@ -71,7 +129,7 @@ public class BuildingRepositoryImpl implements BuildingRepository {
 		if (buildingBean.getRentPriceTo() != null) {
 			sql.append("AND b.rentprice <= " + buildingBean.getRentPriceTo() + " ");
 		}
-		
+
 		if (buildingBean.getManagerPhoneNumber() != null && !buildingBean.getManagerPhoneNumber().equals("")) {
 			sql.append("AND b.managerphonenumber like '%" + buildingBean.getManagerPhoneNumber() + "%' ");
 		}
@@ -79,57 +137,60 @@ public class BuildingRepositoryImpl implements BuildingRepository {
 			sql.append("AND b.managername like '%" + buildingBean.getManagerName() + "%' ");
 		}
 
-
-		List<BuildingEntity> result = new ArrayList<>();
-		try (Connection conn = DriverManager.getConnection(DB_URL, USER, PASS);
-				Statement stmt = conn.createStatement();
-				ResultSet rs = stmt.executeQuery(sql.toString());) {
-			while (rs.next()) {
-				BuildingEntity building = new BuildingEntity();
-
-				building.setId(rs.getInt("id"));
-				building.setName(rs.getString("name"));
-				building.setStreet(rs.getString("street"));
-				building.setWard(rs.getString("ward"));
-				building.setNumberOfBasement(rs.getInt("numberofbasement"));
-				building.setDistrictId(rs.getInt("districtid"));
-				building.setFloorArea(rs.getInt("floorarea"));
-				building.setServiceFee(rs.getString("servicefee"));
-				building.setRentPrice(rs.getInt("rentprice"));
-				building.setManagerName(rs.getString("managername"));
-				building.setManagerPhoneNumber(rs.getString("managerphonenumber"));
-				result.add(building);
-			}
-		} catch (SQLException e) {
-			e.printStackTrace();
-			System.out.println("Connected database failed...");
-		}
-		return result;
+		return sql.toString();
 	}
 
 	@Override
-	public List<String> checkInnerJoin(BuildingBean buildingBean) {
-		List<String> innerJoin = new ArrayList<>();
+	public DistrictEntity findDistrictById(int districtId) {
+		String sql = "SELECT * FROM district WHERE id = ?";
+		DistrictEntity district = null;
+		
 
-		if (buildingBean.getStaffId() != null) {
-		    innerJoin.add(" INNER JOIN assignmentbuilding a ON a.buildingid = b.id AND a.staffid = " + buildingBean.getStaffId());
+		try (Connection conn = DriverManager.getConnection(DB_URL, USER, PASS);
+				PreparedStatement pstmt = (PreparedStatement) conn.prepareStatement(sql)) {
+
+			pstmt.setInt(1, districtId);
+
+			try (ResultSet rs = pstmt.executeQuery()) {
+				if (rs.next()) {
+					district = new DistrictEntity();
+					district.setId(rs.getInt("id"));
+					district.setName(rs.getString("name"));
+				}
+			}
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+			System.out.println("Error fetching district by ID");
 		}
 
-		if (buildingBean.getTypecode() != null) {
-		    innerJoin.add(" INNER JOIN buildingrenttype brt ON brt.buildingid = b.id");
-		    innerJoin.add(" INNER JOIN renttype rt ON rt.id = brt.renttypeid");
-	
-		    if (buildingBean.getStaffId() == null) {
-		        innerJoin.add(" WHERE 1 = 1");
-		    }
-		    
-		    for (String typeCode : buildingBean.getTypecode()) {
-		        innerJoin.add(" AND rt.code LIKE '%" + typeCode + "%'");
-		    }
-		}
-
-		return innerJoin;
-
+		return district;
 	}
 
+	@Override
+	public List<RentareaEntity> findRentareaByBuildingId(int buildingId) {
+		String sql = "SELECT * FROM rentarea WHERE buildingid = ?";
+		List<RentareaEntity> rentAreas = new ArrayList<>();
+
+		try (Connection conn = DriverManager.getConnection(DB_URL, USER, PASS);
+				PreparedStatement pstmt = (PreparedStatement) conn.prepareStatement(sql)) {
+
+			pstmt.setInt(1, buildingId);
+
+			try (ResultSet rs = pstmt.executeQuery()) {
+				while (rs.next()) {
+					RentareaEntity rentArea = new RentareaEntity();
+					rentArea.setId(rs.getInt("id"));
+					rentArea.setValue(rs.getInt("value"));
+					rentAreas.add(rentArea);
+				}
+			}
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+			System.out.println("Error fetching rent areas by building ID");
+		}
+
+		return rentAreas;
+	}
 }
