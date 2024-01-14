@@ -10,6 +10,8 @@ import org.springframework.stereotype.Service;
 import com.javaweb.Bean.BuildingBean;
 import com.javaweb.model.BuildingDTO;
 import com.javaweb.repository.BuildingRepository;
+import com.javaweb.repository.DistrictRepository;
+import com.javaweb.repository.RentAreaRepository;
 import com.javaweb.repository.entity.BuildingEntity;
 import com.javaweb.repository.entity.DistrictEntity;
 import com.javaweb.repository.entity.RentareaEntity;
@@ -29,36 +31,39 @@ public class BuildingServiceImpl implements BuildingService {
 	@Autowired
 	private BuildingRepository buildingRepository;
 
+	@Autowired
+	private DistrictRepository districRepository;
+
+	@Autowired
+	private RentAreaRepository rentAreaRepository;
 
 	@Override
 	public List<BuildingDTO> findAll(BuildingBean buildingBean) {
 		List<BuildingDTO> result = new ArrayList<BuildingDTO>();
 
 		List<BuildingEntity> buildingEntities = buildingRepository.findAll(buildingBean);
-	
-		
+
 		for (BuildingEntity item : buildingEntities) {
 			BuildingDTO building = new BuildingDTO();
 			building.setName(item.getName());
 
-			 DistrictEntity district = buildingRepository.findDistrictById(item.getDistrictId());
-	            if (district != null) {
-	                building.setAddress(item.getStreet() + " , " + item.getWard() + " , " + district.getName());
-	            }
-
+			DistrictEntity district = districRepository.findDistrictById(item.getDistrictId());
+			if (district != null) {
+				building.setAddress(item.getStreet() + " , " + item.getWard() + " , " + district.getName());
+			}
 
 			building.setNumberOfBasement(item.getNumberOfBasement());
 			building.setManagerName(item.getManagerName());
 			building.setManagerPhone(item.getManagerPhoneNumber());
 			building.setFloorArea(item.getFloorArea());
 
-			List<RentareaEntity> rentareaEntities = buildingRepository.findRentareaByBuildingId(item.getId());
-            StringJoiner rentStringBuilder = new StringJoiner(", ");
-            for (RentareaEntity rentArea : rentareaEntities) {
-                rentStringBuilder.add(Integer.toString(rentArea.getValue()));
-            }
-            building.setRentArea(rentStringBuilder.toString());
-		
+			List<RentareaEntity> rentareaEntities = rentAreaRepository.findRentareaByBuildingId(item.getId());
+			StringJoiner rentStringBuilder = new StringJoiner(", ");
+			for (RentareaEntity rentArea : rentareaEntities) {
+				rentStringBuilder.add(Integer.toString(rentArea.getValue()));
+			}
+			building.setRentArea(rentStringBuilder.toString());
+
 			building.setRentPrice(item.getRentPrice());
 			building.setServiceFee(item.getServiceFee());
 			building.setBrokerageFee(item.getBrokerageFee());

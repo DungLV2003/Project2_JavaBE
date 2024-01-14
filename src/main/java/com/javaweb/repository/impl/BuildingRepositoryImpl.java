@@ -13,9 +13,6 @@ import org.springframework.stereotype.Repository;
 import com.javaweb.Bean.BuildingBean;
 import com.javaweb.repository.BuildingRepository;
 import com.javaweb.repository.entity.BuildingEntity;
-import com.javaweb.repository.entity.DistrictEntity;
-import com.javaweb.repository.entity.RentareaEntity;
-import com.mysql.jdbc.PreparedStatement;
 
 @Repository
 
@@ -65,7 +62,7 @@ public class BuildingRepositoryImpl implements BuildingRepository {
 					+ buildingBean.getStaffId());
 		}
 
-		if (buildingBean.getTypecode() != null) {
+		if (buildingBean.getTypecode() != null && !buildingBean.getTypecode().isEmpty()) {
 			innerJoin.add(" INNER JOIN buildingrenttype brt ON brt.buildingid = b.id");
 			innerJoin.add(" INNER JOIN renttype rt ON rt.id = brt.renttypeid");
 
@@ -73,17 +70,23 @@ public class BuildingRepositoryImpl implements BuildingRepository {
 				innerJoin.add(" WHERE 1 = 1");
 			}
 
+			List<String> typeCodeConditions = new ArrayList<>();
 			for (String typeCode : buildingBean.getTypecode()) {
-				innerJoin.add(" AND rt.code LIKE '%" + typeCode + "%'");
+				typeCodeConditions.add(" rt.code LIKE '%" + typeCode + "%'");
 			}
+
+			innerJoin.add(" AND (" + String.join(" OR ", typeCodeConditions) + ")");
 		}
+
+		
 
 		return innerJoin;
 
 	}
 
 	public String buildQuery(BuildingBean buildingBean) {
-		StringBuilder sql = new StringBuilder("SELECT * FROM building b ");
+		StringBuilder sql = new StringBuilder("SELECT DISTINCT b.id, b.name, b.street, b.ward, b.numberofbasement," + 
+				"b.districtid, b.floorarea, b.servicefee, b.rentprice, b.managername, b.managerphonenumber FROM building b ");
 		boolean check = false;
 
 		List<String> innerJoinTable = checkInnerJoin(buildingBean);
@@ -140,57 +143,4 @@ public class BuildingRepositoryImpl implements BuildingRepository {
 		return sql.toString();
 	}
 
-	@Override
-	public DistrictEntity findDistrictById(int districtId) {
-		String sql = "SELECT * FROM district WHERE id = ?";
-		DistrictEntity district = null;
-		
-
-		try (Connection conn = DriverManager.getConnection(DB_URL, USER, PASS);
-				PreparedStatement pstmt = (PreparedStatement) conn.prepareStatement(sql)) {
-
-			pstmt.setInt(1, districtId);
-
-			try (ResultSet rs = pstmt.executeQuery()) {
-				if (rs.next()) {
-					district = new DistrictEntity();
-					district.setId(rs.getInt("id"));
-					district.setName(rs.getString("name"));
-				}
-			}
-
-		} catch (SQLException e) {
-			e.printStackTrace();
-			System.out.println("Error fetching district by ID");
-		}
-
-		return district;
-	}
-
-	@Override
-	public List<RentareaEntity> findRentareaByBuildingId(int buildingId) {
-		String sql = "SELECT * FROM rentarea WHERE buildingid = ?";
-		List<RentareaEntity> rentAreas = new ArrayList<>();
-
-		try (Connection conn = DriverManager.getConnection(DB_URL, USER, PASS);
-				PreparedStatement pstmt = (PreparedStatement) conn.prepareStatement(sql)) {
-
-			pstmt.setInt(1, buildingId);
-
-			try (ResultSet rs = pstmt.executeQuery()) {
-				while (rs.next()) {
-					RentareaEntity rentArea = new RentareaEntity();
-					rentArea.setId(rs.getInt("id"));
-					rentArea.setValue(rs.getInt("value"));
-					rentAreas.add(rentArea);
-				}
-			}
-
-		} catch (SQLException e) {
-			e.printStackTrace();
-			System.out.println("Error fetching rent areas by building ID");
-		}
-
-		return rentAreas;
-	}
 }

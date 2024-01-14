@@ -14,7 +14,4 @@ public interface BuildingRepository {
 
 	String buildQuery(BuildingBean buildingBean);
 
-	DistrictEntity findDistrictById(int districtId);
-
-	List<RentareaEntity> findRentareaByBuildingId(int buildingId);
 }
