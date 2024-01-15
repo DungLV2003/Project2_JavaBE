@@ -72,7 +72,6 @@ public class BuildingRepositoryImpl implements BuildingRepository {
 			}
 		}
 		
-		
 
 		if (buildingBean.getTypecode() != null && !buildingBean.getTypecode().isEmpty()) {
 			innerJoin.add(" INNER JOIN buildingrenttype brt ON brt.buildingid = b.id");
