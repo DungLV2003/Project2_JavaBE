@@ -64,12 +64,6 @@ public class BuildingRepositoryImpl implements BuildingRepository {
 		
 		if(buildingBean.getAreaFrom() != null || buildingBean.getAreaTo() != null) {
 			innerJoin.add(" INNER JOIN rentarea ra on ra.buildingid = b. id ");
-			if(buildingBean.getAreaTo() != null) {
-				innerJoin.add(" AND ra.value <= " + buildingBean.getAreaTo());
-			}
-			if(buildingBean.getAreaFrom() != null) {
-				innerJoin.add(" AND ra.value >= " + buildingBean.getAreaFrom());
-			}
 		}
 		
 
@@ -89,7 +83,6 @@ public class BuildingRepositoryImpl implements BuildingRepository {
 			innerJoin.add(" AND (" + String.join(" OR ", typeCodeConditions) + ")");
 		}
 
-		
 
 		return innerJoin;
 
@@ -111,6 +104,13 @@ public class BuildingRepositoryImpl implements BuildingRepository {
 
 		if (!check) {
 			sql.append(" where 1 = 1 ");
+		}
+		
+		if(buildingBean.getAreaTo() != null) {
+			sql.append(" AND ra.value <= " + buildingBean.getAreaTo() + " ");
+		}
+		if(buildingBean.getAreaFrom() != null) {
+			sql.append(" AND ra.value >= " + buildingBean.getAreaFrom()+ " ");
 		}
 
 		if (buildingBean.getName() != null && !buildingBean.getName().equals("")) {
