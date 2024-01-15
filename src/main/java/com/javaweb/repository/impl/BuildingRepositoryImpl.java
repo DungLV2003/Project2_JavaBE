@@ -61,6 +61,18 @@ public class BuildingRepositoryImpl implements BuildingRepository {
 			innerJoin.add(" INNER JOIN assignmentbuilding a ON a.buildingid = b.id AND a.staffid = "
 					+ buildingBean.getStaffId());
 		}
+		
+		if(buildingBean.getAreaFrom() != null || buildingBean.getAreaTo() != null) {
+			innerJoin.add(" INNER JOIN rentarea ra on ra.buildingid = b. id ");
+			if(buildingBean.getAreaTo() != null) {
+				innerJoin.add(" AND ra.value <= " + buildingBean.getAreaTo());
+			}
+			if(buildingBean.getAreaFrom() != null) {
+				innerJoin.add(" AND ra.value >= " + buildingBean.getAreaFrom());
+			}
+		}
+		
+		
 
 		if (buildingBean.getTypecode() != null && !buildingBean.getTypecode().isEmpty()) {
 			innerJoin.add(" INNER JOIN buildingrenttype brt ON brt.buildingid = b.id");
