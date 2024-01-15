@@ -89,15 +89,13 @@ public class BuildingRepositoryImpl implements BuildingRepository {
 			}
 		}
 
-		if (!check) {
-			sql.append(" where 1 = 1 ");
-		}
+		sql.append(" where 1 = 1 ");
 
 		if (buildingBean.getAreaTo() != null) {
-			sql.append(" AND ra.value <= " + buildingBean.getAreaTo() + " ");
+			sql.append("AND ra.value <= " + buildingBean.getAreaTo() + " ");
 		}
 		if (buildingBean.getAreaFrom() != null) {
-			sql.append(" AND ra.value >= " + buildingBean.getAreaFrom() + " ");
+			sql.append("AND ra.value >= " + buildingBean.getAreaFrom() + " ");
 		}
 
 		if (buildingBean.getName() != null && !buildingBean.getName().equals("")) {
