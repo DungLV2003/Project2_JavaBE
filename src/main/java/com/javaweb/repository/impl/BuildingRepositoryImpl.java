@@ -61,36 +61,23 @@ public class BuildingRepositoryImpl implements BuildingRepository {
 			innerJoin.add(" INNER JOIN assignmentbuilding a ON a.buildingid = b.id AND a.staffid = "
 					+ buildingBean.getStaffId());
 		}
-		
-		if(buildingBean.getAreaFrom() != null || buildingBean.getAreaTo() != null) {
+
+		if (buildingBean.getAreaFrom() != null || buildingBean.getAreaTo() != null) {
 			innerJoin.add(" INNER JOIN rentarea ra on ra.buildingid = b. id ");
 		}
-		
 
 		if (buildingBean.getTypecode() != null && !buildingBean.getTypecode().isEmpty()) {
 			innerJoin.add(" INNER JOIN buildingrenttype brt ON brt.buildingid = b.id");
 			innerJoin.add(" INNER JOIN renttype rt ON rt.id = brt.renttypeid");
-
-			if (buildingBean.getStaffId() == null) {
-				innerJoin.add(" WHERE 1 = 1");
-			}
-
-			List<String> typeCodeConditions = new ArrayList<>();
-			for (String typeCode : buildingBean.getTypecode()) {
-				typeCodeConditions.add(" rt.code LIKE '%" + typeCode + "%'");
-			}
-
-			innerJoin.add(" AND (" + String.join(" OR ", typeCodeConditions) + ")");
 		}
-
 
 		return innerJoin;
 
 	}
 
 	public String buildQuery(BuildingBean buildingBean) {
-		StringBuilder sql = new StringBuilder("SELECT DISTINCT b.id, b.name, b.street, b.ward, b.numberofbasement," + 
-				"b.districtid, b.floorarea, b.servicefee, b.rentprice, b.managername, b.managerphonenumber FROM building b ");
+		StringBuilder sql = new StringBuilder("SELECT DISTINCT b.id, b.name, b.street, b.ward, b.numberofbasement,"
+				+ "b.districtid, b.floorarea, b.servicefee, b.rentprice, b.managername, b.managerphonenumber FROM building b ");
 		boolean check = false;
 
 		List<String> innerJoinTable = checkInnerJoin(buildingBean);
@@ -105,12 +92,12 @@ public class BuildingRepositoryImpl implements BuildingRepository {
 		if (!check) {
 			sql.append(" where 1 = 1 ");
 		}
-		
-		if(buildingBean.getAreaTo() != null) {
+
+		if (buildingBean.getAreaTo() != null) {
 			sql.append(" AND ra.value <= " + buildingBean.getAreaTo() + " ");
 		}
-		if(buildingBean.getAreaFrom() != null) {
-			sql.append(" AND ra.value >= " + buildingBean.getAreaFrom()+ " ");
+		if (buildingBean.getAreaFrom() != null) {
+			sql.append(" AND ra.value >= " + buildingBean.getAreaFrom() + " ");
 		}
 
 		if (buildingBean.getName() != null && !buildingBean.getName().equals("")) {
@@ -149,6 +136,14 @@ public class BuildingRepositoryImpl implements BuildingRepository {
 		}
 		if (buildingBean.getManagerName() != null && !buildingBean.getManagerName().equals("")) {
 			sql.append("AND b.managername like '%" + buildingBean.getManagerName() + "%' ");
+		}
+		if (buildingBean.getTypecode() != null && !buildingBean.getTypecode().isEmpty()) {
+			List<String> typeCodeConditions = new ArrayList<>();
+			for (String typeCode : buildingBean.getTypecode()) {
+				typeCodeConditions.add(" rt.code LIKE '%" + typeCode + "%'");
+			}
+
+			sql.append(" AND (" + String.join(" OR ", typeCodeConditions) + ")");
 		}
 
 		return sql.toString();
