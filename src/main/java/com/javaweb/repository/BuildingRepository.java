@@ -1,17 +1,12 @@
 package com.javaweb.repository;
 
 import java.util.List;
+import java.util.Map;
 
 import com.javaweb.Bean.BuildingBean;
 import com.javaweb.repository.entity.BuildingEntity;
-import com.javaweb.repository.entity.DistrictEntity;
-import com.javaweb.repository.entity.RentareaEntity;
 
 public interface BuildingRepository {
-	List<BuildingEntity> findAll(BuildingBean buildingBean);
-
-	List<String> checkInnerJoin(BuildingBean buildingBean);
-
-	String buildQuery(BuildingBean buildingBean);
+	List<BuildingEntity> findAll(Map<String, Object> params, List<String> typeCode);
 
 }

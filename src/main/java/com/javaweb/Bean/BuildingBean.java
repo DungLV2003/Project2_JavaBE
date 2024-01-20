@@ -5,7 +5,7 @@ import java.util.List;
 public class BuildingBean {
 	private String name;
 	private Integer districtId;
-	private List<String> typecode;
+	private List<String> typeCode;
 	private String ward;
 	private String street;
 	private Integer floorArea;
@@ -36,12 +36,14 @@ public class BuildingBean {
 		this.districtId = districtId;
 	}
 
-	public List<String> getTypecode() {
-		return typecode;
+	
+	
+	public List<String> getTypeCode() {
+		return typeCode;
 	}
 
-	public void setTypecode(List<String> typecode) {
-		this.typecode = typecode;
+	public void setTypeCode(List<String> typeCode) {
+		this.typeCode = typeCode;
 	}
 
 	public String getWard() {

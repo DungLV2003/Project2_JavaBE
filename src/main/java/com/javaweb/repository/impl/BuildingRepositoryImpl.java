@@ -1,36 +1,125 @@
 package com.javaweb.repository.impl;
 
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Repository;
 
-import com.javaweb.Bean.BuildingBean;
 import com.javaweb.repository.BuildingRepository;
 import com.javaweb.repository.entity.BuildingEntity;
+import com.javaweb.utils.ConnectionJDBCUtils;
+import com.javaweb.utils.NumberUtil;
+import com.javaweb.utils.StringUtil;
 
 @Repository
 
 public class BuildingRepositoryImpl implements BuildingRepository {
 
-	static final String DB_URL = "jdbc:mysql://localhost:3306/estatebasic";
-	static final String USER = "root";
-	static final String PASS = "dung0325325380";
+	public static void joinTable(Map<String, Object> params, List<String> typeCode, StringBuilder sql) {
+		String staffId = (String) params.get("staffId");
+		if (StringUtil.checkString(staffId)) {
+			sql.append(" INNER JOIN assignmentbuilding a ON a.buildingid = b.id  ");
+		}
+		if (typeCode != null && typeCode.size() != 0) {
+			sql.append(" INNER JOIN buildingrenttype brt ON brt.buildingid = b.id ");
+			sql.append(" INNER JOIN renttype rt ON rt.id = brt.renttypeid ");
+		}
+//		String rentAreaTo = (String) params.get("areaTo");
+//		String rentAreaFrom = (String) params.get("areaFrom");
+//		if (StringUtil.checkString(rentAreaFrom) == true || StringUtil.checkString(rentAreaTo) == true) {
+//			sql.append(" INNER JOIN rentarea ra on ra.buildingid = b.id ");
+//		}
+	}
+
+	public static void queryNormal(Map<String, Object> params, StringBuilder where) {
+		for (Map.Entry<String, Object> it : params.entrySet()) {
+			if (!it.getKey().equals("staffId") && !it.getKey().equals("typeCode") && !it.getKey().startsWith("area")
+					&& !it.getKey().startsWith("rentPrice")) {
+				String value = it.getValue().toString();
+				if (StringUtil.checkString(value)) {
+					if (NumberUtil.isNumber(value) == true) {
+						where.append(" AND b." + it.getKey() + " = " + value);
+					} else {
+						where.append(" AND b." + it.getKey() + " LIKE '%" + value + "%' ");
+					}
+				}
+			}
+		}
+	}
+
+	public static void querySpecial(Map<String, Object> params, List<String> typeCode, StringBuilder where) {
+		String staffId = (String) params.get("staffId");
+		if (StringUtil.checkString(staffId)) {
+			where.append(" AND a.staffid = " + staffId);
+		}
+		String rentAreaTo = (String) params.get("areaTo");
+		String rentAreaFrom = (String) params.get("areaFrom");
+		if (StringUtil.checkString(rentAreaFrom) == true || StringUtil.checkString(rentAreaTo) == true) {
+			where.append(" AND EXISTS (SELECT * FROM rentarea ra WHERE b.id = ra.buildingid ");
+			if (StringUtil.checkString(rentAreaFrom)) {
+				where.append(" AND ra.value >= " + rentAreaFrom);
+			}
+			if (StringUtil.checkString(rentAreaTo)) {
+				where.append(" AND ra.value <=" + rentAreaTo);
+			}
+			where.append(" ) ");
+		}
+
+		String rentPriceTo = (String) params.get("rentPriceTo");
+		String rentPriceFrom = (String) params.get("rentPriceFrom");
+		if (StringUtil.checkString(rentPriceTo) == true || StringUtil.checkString(rentPriceFrom) == true) {
+			if (StringUtil.checkString(rentPriceFrom)) {
+				where.append(" AND b.rentprice >=" + rentPriceFrom);
+			}
+			if (StringUtil.checkString(rentPriceTo)) {
+				where.append(" AND b.rentprice <=" + rentPriceTo);
+			}
+		}
+
+		// Java 7
+//		if (typeCode != null && typeCode.size() != 0) {
+//			List<String> code = new ArrayList<>();
+//			for (String item : typeCode) {
+//				code.add("'" + item + "'");
+//			}
+//			where.append(" AND rt.code IN(" + String.join(",", code) + ") ");
+//		}
+
+		// Java 8
+		if (typeCode != null && typeCode.size() != 0) {
+			where.append(" AND ( ");
+			String sql = typeCode.stream().map(it -> "rt.code LIKE " + "'%" + it + "%'")
+					.collect(Collectors.joining(" OR "));
+			where.append(sql);
+			where.append(" ) ");
+		}
+
+	}
 
 	@Override
-	public List<BuildingEntity> findAll(BuildingBean buildingBean) {
+	public List<BuildingEntity> findAll(Map<String, Object> params, List<String> typeCode) {
+		StringBuilder sql = new StringBuilder(
+				"SELECT DISTINCT b.id, b.name, b.districtid, b.ward, b.street, b.numberofbasement, b.floorarea, b.rentprice,"
+						+ " b.managername, b.managerphonenumber, b.servicefee, b.brokeragefee FROM building b ");
 
-		String sql = buildQuery(buildingBean);
+		joinTable(params, typeCode, sql);
+		StringBuilder where = new StringBuilder(" WHERE 1 = 1 ");
+		queryNormal(params, where);
+		querySpecial(params, typeCode, where);
+
+		sql.append(where);
 
 		List<BuildingEntity> result = new ArrayList<>();
-		try (Connection conn = DriverManager.getConnection(DB_URL, USER, PASS);
+
+		try (Connection conn = ConnectionJDBCUtils.getConnection();
 				Statement stmt = conn.createStatement();
-				ResultSet rs = stmt.executeQuery(sql);) {
+				ResultSet rs = stmt.executeQuery(sql.toString());) {
 			while (rs.next()) {
 				BuildingEntity building = new BuildingEntity();
 				building.setId(rs.getInt("id"));
@@ -44,6 +133,8 @@ public class BuildingRepositoryImpl implements BuildingRepository {
 				building.setRentPrice(rs.getInt("rentprice"));
 				building.setManagerName(rs.getString("managername"));
 				building.setManagerPhoneNumber(rs.getString("managerphonenumber"));
+				building.setBrokerageFee(rs.getInt("brokeragefee"));
+				building.setServiceFee(rs.getString("servicefee"));
 				result.add(building);
 			}
 		} catch (SQLException e) {
@@ -51,100 +142,6 @@ public class BuildingRepositoryImpl implements BuildingRepository {
 			System.out.println("Connected database failed...");
 		}
 		return result;
-	}
-
-	@Override
-	public List<String> checkInnerJoin(BuildingBean buildingBean) {
-		List<String> innerJoin = new ArrayList<>();
-
-		if (buildingBean.getStaffId() != null) {
-			innerJoin.add(" INNER JOIN assignmentbuilding a ON a.buildingid = b.id AND a.staffid = "
-					+ buildingBean.getStaffId());
-		}
-
-		if (buildingBean.getAreaFrom() != null || buildingBean.getAreaTo() != null) {
-			innerJoin.add(" INNER JOIN rentarea ra on ra.buildingid = b. id ");
-		}
-
-		if (buildingBean.getTypecode() != null && !buildingBean.getTypecode().isEmpty()) {
-			innerJoin.add(" INNER JOIN buildingrenttype brt ON brt.buildingid = b.id");
-			innerJoin.add(" INNER JOIN renttype rt ON rt.id = brt.renttypeid");
-		}
-
-		return innerJoin;
-
-	}
-
-	public String buildQuery(BuildingBean buildingBean) {
-		StringBuilder sql = new StringBuilder("SELECT DISTINCT b.id, b.name, b.street, b.ward, b.numberofbasement,"
-				+ "b.districtid, b.floorarea, b.servicefee, b.rentprice, b.managername, b.managerphonenumber FROM building b ");
-		boolean check = false;
-
-		List<String> innerJoinTable = checkInnerJoin(buildingBean);
-
-		if (innerJoinTable != null && !innerJoinTable.isEmpty()) {
-			check = true;
-			for (String innerJoin : innerJoinTable) {
-				sql.append(innerJoin);
-			}
-		}
-
-		sql.append(" where 1 = 1 ");
-
-		if (buildingBean.getAreaTo() != null) {
-			sql.append("AND ra.value <= " + buildingBean.getAreaTo() + " ");
-		}
-		if (buildingBean.getAreaFrom() != null) {
-			sql.append("AND ra.value >= " + buildingBean.getAreaFrom() + " ");
-		}
-
-		if (buildingBean.getName() != null && !buildingBean.getName().equals("")) {
-			sql.append("AND b.name like '%" + buildingBean.getName() + "%' ");
-		}
-		if (buildingBean.getDistrictId() != null) {
-			sql.append("AND b.districtid = " + buildingBean.getDistrictId() + " ");
-		}
-		if (buildingBean.getFloorArea() != null) {
-			sql.append("AND b.floorarea = " + buildingBean.getFloorArea() + " ");
-		}
-		if (buildingBean.getWard() != null && !buildingBean.getWard().equals("")) {
-			sql.append("AND b.ward like '%" + buildingBean.getWard() + "%' ");
-		}
-		if (buildingBean.getStreet() != null && !buildingBean.getStreet().equals("")) {
-			sql.append("AND b.street like '%" + buildingBean.getStreet() + "%' ");
-		}
-		if (buildingBean.getNumberOfBasement() != null) {
-			sql.append("AND b.numberofbasement = " + buildingBean.getNumberOfBasement() + " ");
-		}
-		if (buildingBean.getDirection() != null && !buildingBean.getDirection().equals("")) {
-			sql.append("AND b.direction like '%" + buildingBean.getDirection() + "%' ");
-		}
-		if (buildingBean.getLevel() != null && !buildingBean.getLevel().equals("")) {
-			sql.append("AND b.level like '%" + buildingBean.getLevel() + "%' ");
-		}
-		if (buildingBean.getRentPriceFrom() != null) {
-			sql.append("AND b.rentprice >= " + buildingBean.getRentPriceFrom() + " ");
-		}
-		if (buildingBean.getRentPriceTo() != null) {
-			sql.append("AND b.rentprice <= " + buildingBean.getRentPriceTo() + " ");
-		}
-
-		if (buildingBean.getManagerPhoneNumber() != null && !buildingBean.getManagerPhoneNumber().equals("")) {
-			sql.append("AND b.managerphonenumber like '%" + buildingBean.getManagerPhoneNumber() + "%' ");
-		}
-		if (buildingBean.getManagerName() != null && !buildingBean.getManagerName().equals("")) {
-			sql.append("AND b.managername like '%" + buildingBean.getManagerName() + "%' ");
-		}
-		if (buildingBean.getTypecode() != null && !buildingBean.getTypecode().isEmpty()) {
-			List<String> typeCodeConditions = new ArrayList<>();
-			for (String typeCode : buildingBean.getTypecode()) {
-				typeCodeConditions.add(" rt.code LIKE '%" + typeCode + "%'");
-			}
-
-			sql.append(" AND (" + String.join(" OR ", typeCodeConditions) + ")");
-		}
-
-		return sql.toString();
 	}
 
 }

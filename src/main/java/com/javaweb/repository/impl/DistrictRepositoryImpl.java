@@ -6,43 +6,31 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
-import com.javaweb.repository.BuildingRepository;
 import com.javaweb.repository.DistrictRepository;
 import com.javaweb.repository.entity.DistrictEntity;
+import com.javaweb.utils.ConnectionJDBCUtils;
 
 @Repository
 public class DistrictRepositoryImpl implements DistrictRepository {
 
-	static final String DB_URL = "jdbc:mysql://localhost:3306/estatebasic";
-	static final String USER = "root";
-	static final String PASS = "dung0325325380";
 
 	@Override
 	 public DistrictEntity findDistrictById(int districtId) {
-        String sql = "SELECT * FROM district WHERE id = ?";
-        DistrictEntity district = null;
-
-        try (Connection conn = DriverManager.getConnection(DB_URL, USER, PASS);
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
-
-            pstmt.setInt(1, districtId);
-
-            try (ResultSet rs = pstmt.executeQuery()) {
-                if (rs.next()) {
-                    district = new DistrictEntity();
-                    district.setId(rs.getInt("id"));
-                    district.setName(rs.getString("name"));
-                }
-            }
-
+        String sql = "SELECT d.name FROM district d WHERE d.id = " + districtId + ";" ;
+        DistrictEntity districtEntity = new DistrictEntity();
+        try (Connection conn = ConnectionJDBCUtils.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql);
+        		ResultSet rs = pstmt.executeQuery(sql)) {
+        	while(rs.next()) {
+        		districtEntity.setName(rs.getString("name"));
+        	}
         } catch (SQLException e) {
             e.printStackTrace();
             System.out.println("Error fetching district by ID");
         }
 
-        return district;
+        return districtEntity;
     }
 }
