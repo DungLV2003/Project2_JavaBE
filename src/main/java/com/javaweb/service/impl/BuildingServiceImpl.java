@@ -3,19 +3,16 @@ package com.javaweb.service.impl;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.StringJoiner;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.javaweb.builder.BuildingSearchBuilder;
 import com.javaweb.converter.BuildingConverter;
+import com.javaweb.converter.BuildingSearchBuilderConverter;
 import com.javaweb.model.BuildingDTO;
 import com.javaweb.repository.BuildingRepository;
-import com.javaweb.repository.DistrictRepository;
-import com.javaweb.repository.RentAreaRepository;
 import com.javaweb.repository.entity.BuildingEntity;
-import com.javaweb.repository.entity.DistrictEntity;
-import com.javaweb.repository.entity.RentareaEntity;
 
 @Service
 public class BuildingServiceImpl implements BuildingService {
@@ -34,12 +31,15 @@ public class BuildingServiceImpl implements BuildingService {
 
 	@Autowired // vì k có hàm khởi tạo
 	private BuildingConverter buildingConverter;
+	
+	@Autowired 
+	private BuildingSearchBuilderConverter buildingSearchBuilderConverter;
 
 	@Override
 	public List<BuildingDTO> findAll(Map<String, Object> params, List<String> typeCode) {
+		BuildingSearchBuilder buildingSearchBuilder = buildingSearchBuilderConverter.toBuildingSearchBuilder(params, typeCode);
+		List<BuildingEntity> buildingEntities = buildingRepository.findAll(buildingSearchBuilder);
 		List<BuildingDTO> result = new ArrayList<BuildingDTO>();
-		List<BuildingEntity> buildingEntities = buildingRepository.findAll(params,typeCode);
-
 		for (BuildingEntity item : buildingEntities) {
 			BuildingDTO building = buildingConverter.toBuildingDTO(item);
 			result.add(building);

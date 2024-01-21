@@ -4,7 +4,7 @@ import java.util.Map;
 
 public class MapUtil {
 	public static <T> T getObject(Map<String, Object> params,String key ,Class<T> tClass) {
-		Object obj = params.getOrDefault(key, null);
+		Object obj = params.getOrDefault(key, null); //nếu key có value thì cho sang obj còn k có thì mặc định là null
 		if(obj != null) {
 			if(tClass.getTypeName().equals("java.lang.Long")) {
 				obj = obj != "" ? Long.valueOf(obj.toString()) : null ;
