@@ -22,7 +22,7 @@ import com.javaweb.utils.ConnectionJDBCUtils;
 @Repository
 @PropertySource("classpath:application-uat.properties")
 
-public class BuildingRepositoryImpl implements BuildingRepository {
+public class JDBCBuildingRepositoryImpl implements BuildingRepository {
 	
 	@Value("${spring.datasource.url}")
 	private String DB_URL;
@@ -149,7 +149,7 @@ public class BuildingRepositoryImpl implements BuildingRepository {
 				building.setStreet(rs.getString("street"));
 				building.setWard(rs.getString("ward"));
 				building.setNumberOfBasement(rs.getInt("numberofbasement"));
-				building.setDistrictId(rs.getInt("districtid"));
+				//building.setDistrictId(rs.getInt("districtid"));
 				building.setFloorArea(rs.getInt("floorarea"));
 				building.setServiceFee(rs.getString("servicefee"));
 				building.setRentPrice(rs.getInt("rentprice"));

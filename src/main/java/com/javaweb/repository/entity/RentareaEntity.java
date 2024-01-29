@@ -2,14 +2,38 @@ package com.javaweb.repository.entity;
 
 import java.util.Date;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+
+@Entity
+@Table(name = "rentarea")
 public class RentareaEntity {
+	
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer id;
+	
+	@Column(name = "value")
 	private Integer value;
-	private Integer buildingId;
-	private Date createdDate;
-	private Date modifiedDate;
-	private String createdBy;
-	private String modidiedBy;
+	
+	@ManyToOne
+	@JoinColumn(name = "buildingid")
+	private BuildingEntity buildingEntity;
+	
+
+	public BuildingEntity getBuildingEntity() {
+		return buildingEntity;
+	}
+
+	public void setBuildingEntity(BuildingEntity buildingEntity) {
+		this.buildingEntity = buildingEntity;
+	}
 
 	public Integer getId() {
 		return id;
@@ -17,14 +41,6 @@ public class RentareaEntity {
 
 	public void setId(Integer id) {
 		this.id = id;
-	}
-
-	public Integer getBuildingId() {
-		return buildingId;
-	}
-
-	public void setBuildingId(Integer buildingId) {
-		this.buildingId = buildingId;
 	}
 
 	public Integer getValue() {
@@ -35,43 +51,11 @@ public class RentareaEntity {
 		this.value = value;
 	}
 
-	public Date getCreatedDate() {
-		return createdDate;
-	}
-
-	public void setCreatedDate(Date createdDate) {
-		this.createdDate = createdDate;
-	}
-
-	public Date getModifiedDate() {
-		return modifiedDate;
-	}
-
-	public void setModifiedDate(Date modifiedDate) {
-		this.modifiedDate = modifiedDate;
-	}
-
-	public String getCreatedBy() {
-		return createdBy;
-	}
-
-	public void setCreatedBy(String createdBy) {
-		this.createdBy = createdBy;
-	}
-
-	public String getModidiedBy() {
-		return modidiedBy;
-	}
-
-	public void setModidiedBy(String modidiedBy) {
-		this.modidiedBy = modidiedBy;
-	}
-
 	@Override
 	public String toString() {
-		return "RentareaEntity [id=" + id + ", value=" + value + ", buildingId=" + buildingId + ", createdDate="
-				+ createdDate + ", modifiedDate=" + modifiedDate + ", createdBy=" + createdBy + ", modidiedBy="
-				+ modidiedBy + "]";
+		return "RentareaEntity [id=" + id + ", value=" + value + ", buildingEntity=" + buildingEntity + "]";
 	}
+
+	
 
 }
