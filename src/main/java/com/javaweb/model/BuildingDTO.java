@@ -2,6 +2,7 @@ package com.javaweb.model;
 
 //DT0 = Data transfer Object (đối tượng luân chuyển dữ liệu)
 public class BuildingDTO {
+
 	private String name;
 	private String address; //District, ward, street 
 	private Integer numberOfBasement;

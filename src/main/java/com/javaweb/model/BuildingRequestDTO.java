@@ -1,6 +1,7 @@
 package com.javaweb.model;
 
 public class BuildingRequestDTO {
+	private Integer id;
 	private String name;
 	private String ward;
 	private String street;
@@ -35,6 +36,12 @@ public class BuildingRequestDTO {
 	}
 	public void setRentPrice(Integer rentPrice) {
 		this.rentPrice = rentPrice;
+	}
+	public Integer getId() {
+		return id;
+	}
+	public void setId(Integer id) {
+		this.id = id;
 	}
 	
 	
