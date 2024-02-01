@@ -15,6 +15,4 @@ import com.javaweb.utils.ConnectionJDBCUtils;
 
 @Repository
 public class RentAreaRepositoryImpl {
-
-
 }

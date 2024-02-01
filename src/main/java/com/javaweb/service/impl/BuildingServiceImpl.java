@@ -17,19 +17,10 @@ import com.javaweb.repository.entity.BuildingEntity;
 @Service
 public class BuildingServiceImpl implements BuildingService {
 
-	// Có autowired mới gọi trực tiếp được đến interface (Xem buổi 9). Trương hợp
-	// này đang theo mô hình 3 layer và dùng các annotaion nên phải dùng anotation
-	// @autowired
-
-	// K gọi thông qua interface mà gọi đến java class Imple của nó cũng đc. Thì k
-	// cần dùng autowired chỉ cần khởi tạo đối tượng của class đấy thôi
-
-	// Nhưng mà khuyến khích sử dụng interface để phân tầng code cho clean hơn, có
-	// nói trong clean code và đi làm dùng interface rất nhiều
 	@Autowired
 	private BuildingRepository buildingRepository;
 
-	@Autowired // vì k có hàm khởi tạo
+	@Autowired 
 	private BuildingConverter buildingConverter;
 	
 	@Autowired 

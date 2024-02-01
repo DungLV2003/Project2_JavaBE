@@ -34,31 +34,18 @@ public class RoleEntity {
 		public void setId(Integer id) {
 			this.id = id;
 		}
-		
-		@ManyToMany(mappedBy = "roles", fetch = FetchType.LAZY)
-		private List<UserEntity> users = new ArrayList<>();
-		
-		
-		
 
-//		@OneToMany(mappedBy = "role", fetch = FetchType.LAZY)
-//		private List<UserRoleEntity> userRoleEntities = new ArrayList<>();
-//		
-//		public List<UserRoleEntity> getUserRoleEntities() {
-//			return userRoleEntities;
-//		}
-//
-//		public void setUserRoleEntities(List<UserRoleEntity> userRoleEntities) {
-//			this.userRoleEntities = userRoleEntities;
-//		}
 
-		public List<UserEntity> getUsers() {
-			return users;
+		@OneToMany(mappedBy = "role", fetch = FetchType.LAZY)
+		private List<UserRoleEntity> userRoleEntities = new ArrayList<>();
+		
+		public List<UserRoleEntity> getUserRoleEntities() {
+			return userRoleEntities;
 		}
 
-		public void setUsers(List<UserEntity> users) {
-			this.users = users;
-		}
+		public void setUserRoleEntities(List<UserRoleEntity> userRoleEntities) {
+			this.userRoleEntities = userRoleEntities;
+		}	
 
 		public String getName() {
 			return name;

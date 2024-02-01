@@ -10,30 +10,22 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.PropertySource;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
+
 import org.springframework.stereotype.Repository;
 
 import com.javaweb.builder.BuildingSearchBuilder;
 import com.javaweb.repository.BuildingRepository;
 import com.javaweb.repository.entity.BuildingEntity;
-import com.javaweb.utils.ConnectionJDBCUtils;
 
 @Repository
-@PropertySource("classpath:application-uat.properties")
 
-public class JDBCBuildingRepositoryImpl implements BuildingRepository {
+public class BuildingRepositoryImpl implements BuildingRepository {
+	@PersistenceContext
+	private EntityManager entityManager;
 	
-	@Value("${spring.datasource.url}")
-	private String DB_URL;
-	
-	@Value("${spring.datasource.username}")
-	private String USER;
-	
-	@Value("${spring.datasource.password}")
-	private String PASS;
-	
-
 	public static void joinTable(BuildingSearchBuilder buildingSearchBuilder, StringBuilder sql) {
 		Integer staffId = buildingSearchBuilder.getStaffId();
 		if (staffId != null) {
@@ -103,15 +95,6 @@ public class JDBCBuildingRepositoryImpl implements BuildingRepository {
 			}
 		}
 
-		// Java 7
-//		if (typeCode != null && typeCode.size() != 0) {
-//			List<String> code = new ArrayList<>();
-//			for (String item : typeCode) {
-//				code.add("'" + item + "'");
-//			}
-//			where.append(" AND rt.code IN(" + String.join(",", code) + ") ");
-//		}
-
 		// Java 8
 		List<String> typeCode = buildingSearchBuilder.getTypeCode();
 		if (typeCode != null && typeCode.size() != 0) {
@@ -126,44 +109,15 @@ public class JDBCBuildingRepositoryImpl implements BuildingRepository {
 
 	@Override
 	public List<BuildingEntity> findAll(BuildingSearchBuilder buildingSearchBuilder) {
-		StringBuilder sql = new StringBuilder(
-				"SELECT DISTINCT b.id, b.name, b.districtid, b.ward, b.street, b.numberofbasement, b.floorarea, b.rentprice,"
-						+ " b.managername, b.managerphonenumber, b.servicefee, b.brokeragefee FROM building b ");
-
+		StringBuilder sql = new StringBuilder("SELECT b.* FROM building b "); 
 		joinTable(buildingSearchBuilder, sql);
 		StringBuilder where = new StringBuilder(" WHERE 1 = 1 ");
 		queryNormal(buildingSearchBuilder, where);
 		querySpecial(buildingSearchBuilder, where);
-
+		where.append(" GROUP BY b.id;");
 		sql.append(where);
-
-		List<BuildingEntity> result = new ArrayList<>();
-
-		try (Connection conn = DriverManager.getConnection(DB_URL, USER, PASS);
-				Statement stmt = conn.createStatement();
-				ResultSet rs = stmt.executeQuery(sql.toString());) {
-			while (rs.next()) {
-				BuildingEntity building = new BuildingEntity();
-				building.setId(rs.getInt("id"));
-				building.setName(rs.getString("name"));
-				building.setStreet(rs.getString("street"));
-				building.setWard(rs.getString("ward"));
-				building.setNumberOfBasement(rs.getInt("numberofbasement"));
-				//building.setDistrictId(rs.getInt("districtid"));
-				building.setFloorArea(rs.getInt("floorarea"));
-				building.setServiceFee(rs.getString("servicefee"));
-				building.setRentPrice(rs.getInt("rentprice"));
-				building.setManagerName(rs.getString("managername"));
-				building.setManagerPhoneNumber(rs.getString("managerphonenumber"));
-				building.setBrokerageFee(rs.getInt("brokeragefee"));
-				building.setServiceFee(rs.getString("servicefee"));
-				result.add(building);
-			}
-		} catch (SQLException e) {
-			e.printStackTrace();
-			System.out.println("Connected database failed...");
-		}
-		return result;
+		Query query = entityManager.createNativeQuery(sql.toString(), BuildingEntity.class);
+		return query.getResultList();
 	}
 
 }
