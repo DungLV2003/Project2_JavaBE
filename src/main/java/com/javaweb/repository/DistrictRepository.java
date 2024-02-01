@@ -5,5 +5,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import com.javaweb.repository.entity.DistrictEntity;
 
 public interface DistrictRepository extends JpaRepository<DistrictEntity, Integer> {
-	DistrictEntity findDistrictById(int districtId);
+	//DistrictEntity findDistrictById(int districtId);
 }

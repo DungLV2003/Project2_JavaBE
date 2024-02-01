@@ -12,7 +12,7 @@ import com.javaweb.repository.DistrictRepository;
 import com.javaweb.repository.entity.DistrictEntity;
 import com.javaweb.utils.ConnectionJDBCUtils;
 
-@Repository
+//@Repository
 public class DistrictRepositoryImpl {
 
 }

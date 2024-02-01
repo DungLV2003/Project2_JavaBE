@@ -14,7 +14,7 @@ import com.javaweb.repository.entity.RentareaEntity;
 
 @Component // đánh dấu 1 java class là 1 bean (k có hàm khởi tạo nếu dùng phải autowried)
 public class BuildingConverter {
-	
+
 	@Autowired
 	private ModelMapper modelMapper;
 

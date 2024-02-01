@@ -123,7 +123,7 @@ public class BuildingRepositoryImpl implements BuildingRepositoryCustom {
 		StringBuilder where = new StringBuilder(" WHERE 1 = 1 ");
 		queryNormal(buildingSearchBuilder, where);
 		querySpecial(buildingSearchBuilder, where);
-		where.append("GROUP BY b.id;");
+		where.append(" GROUP BY b.id;");
 		sql.append(where);
 		Query query = entityManager.createNativeQuery(sql.toString(), BuildingEntity.class);
 		return query.getResultList();

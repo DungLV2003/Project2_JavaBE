@@ -13,7 +13,7 @@ import com.javaweb.repository.RentAreaRepository;
 import com.javaweb.repository.entity.RentareaEntity;
 import com.javaweb.utils.ConnectionJDBCUtils;
 
-@Repository
+//@Repository
 public class RentAreaRepositoryImpl {
 
 

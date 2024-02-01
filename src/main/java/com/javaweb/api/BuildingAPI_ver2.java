@@ -52,14 +52,14 @@ public class BuildingAPI_ver2 {
 //		return result;
 //	}
 	
-	@GetMapping(value = "/api/building/{name}/{street}")
-	// Khi làm phải thông qua BuildingDTO chứ k đc dùng building entity như này
-	public BuildingDTO getBuildingByName(@PathVariable String name, @PathVariable String street) {
-		BuildingDTO result = new BuildingDTO();
-		List<BuildingEntity> building = buildingRepository.findByNameContainingAndStreet(name, street);
-		return result;
-	}
-	
+//	@GetMapping(value = "/api/building/{name}/{street}")
+//	// Khi làm phải thông qua BuildingDTO chứ k đc dùng building entity như này
+//	public BuildingDTO getBuildingByName(@PathVariable String name, @PathVariable String street) {
+//		BuildingDTO result = new BuildingDTO();
+//		List<BuildingEntity> building = buildingRepository.findByNameContainingAndStreet(name, street);
+//		return result;
+//	}
+//	
 //	@GetMapping(value = "/api/building/{id}")
 //	// Khi làm phải thông qua BuildingDTO chứ k đc dùng building entity như này
 //	public BuildingDTO getBuildingById(@PathVariable Integer id) {
@@ -74,23 +74,23 @@ public class BuildingAPI_ver2 {
 //		buildingRepository.deleteById(id);
 //	}
 	
-	@DeleteMapping(value = "/api/building/{ids}")
-	public void deleteBuilding(@PathVariable Integer[] ids) {
-		buildingRepository.deleteByIdIn(ids);
-	}
-
-	@PostMapping(value = "/api/building/")
-	public void createBuilding(@RequestBody BuildingRequestDTO buildingRequestDTO) {
-		BuildingEntity buildingEntity = new BuildingEntity();
-		buildingEntity.setName(buildingRequestDTO.getName());
-		buildingEntity.setStreet(buildingRequestDTO.getStreet());
-		buildingEntity.setWard(buildingRequestDTO.getWard());
-		DistrictEntity districtEntity = new DistrictEntity();
-		districtEntity.setId(buildingRequestDTO.getDistrictId());
-		buildingEntity.setDistrict(districtEntity);
-		entityManager.persist(buildingEntity);
-		System.out.println("ok");
-	}
+//	@DeleteMapping(value = "/api/building/{ids}")
+//	public void deleteBuilding(@PathVariable Integer[] ids) {
+//		buildingRepository.deleteByIdIn(ids);
+//	}
+//
+//	@PostMapping(value = "/api/building/")
+//	public void createBuilding(@RequestBody BuildingRequestDTO buildingRequestDTO) {
+//		BuildingEntity buildingEntity = new BuildingEntity();
+//		buildingEntity.setName(buildingRequestDTO.getName());
+//		buildingEntity.setStreet(buildingRequestDTO.getStreet());
+//		buildingEntity.setWard(buildingRequestDTO.getWard());
+//		DistrictEntity districtEntity = new DistrictEntity();
+//		districtEntity.setId(buildingRequestDTO.getDistrictId());
+//		buildingEntity.setDistrict(districtEntity);
+//		entityManager.persist(buildingEntity);
+//		System.out.println("ok");
+//	}
 
 //	@PutMapping(value = "/api/building/")
 //	public void updateBuilding(@RequestBody BuildingRequestDTO buildingRequestDTO) {
@@ -106,18 +106,18 @@ public class BuildingAPI_ver2 {
 //		System.out.println("ok");
 //	}
 	
-	@PutMapping(value = "/api/building/")
-	public void updateBuilding(@RequestBody BuildingRequestDTO buildingRequestDTO) {
-		BuildingEntity buildingEntity = buildingRepository.findById(buildingRequestDTO.getId()).get();
-		buildingEntity.setName(buildingRequestDTO.getName());
-		buildingEntity.setStreet(buildingRequestDTO.getStreet());
-		buildingEntity.setWard(buildingRequestDTO.getWard());
-		DistrictEntity districtEntity = new DistrictEntity();
-		districtEntity.setId(buildingRequestDTO.getDistrictId());
-		buildingEntity.setDistrict(districtEntity);
-		buildingRepository.save(buildingEntity);
-		System.out.println("ok");
-	}
+//	@PutMapping(value = "/api/building/")
+//	public void updateBuilding(@RequestBody BuildingRequestDTO buildingRequestDTO) {
+//		BuildingEntity buildingEntity = buildingRepository.findById(buildingRequestDTO.getId()).get();
+//		buildingEntity.setName(buildingRequestDTO.getName());
+//		buildingEntity.setStreet(buildingRequestDTO.getStreet());
+//		buildingEntity.setWard(buildingRequestDTO.getWard());
+//		DistrictEntity districtEntity = new DistrictEntity();
+//		districtEntity.setId(buildingRequestDTO.getDistrictId());
+//		buildingEntity.setDistrict(districtEntity);
+//		buildingRepository.save(buildingEntity);
+//		System.out.println("ok");
+//	}
 
 
 	//JPA

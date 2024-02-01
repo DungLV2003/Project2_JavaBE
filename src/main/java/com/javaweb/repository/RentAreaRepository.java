@@ -7,5 +7,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import com.javaweb.repository.entity.RentareaEntity;
 
 public interface RentAreaRepository extends JpaRepository<RentareaEntity, Integer> {
-	List<RentareaEntity> findRentareaByBuildingId(int buildingId);
+	//List<RentareaEntity> findRentareaByBuildingId(int buildingId);
 }
