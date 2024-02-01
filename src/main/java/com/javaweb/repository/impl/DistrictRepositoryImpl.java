@@ -30,7 +30,6 @@ public class DistrictRepositoryImpl implements DistrictRepository {
             e.printStackTrace();
             System.out.println("Error fetching district by ID");
         }
-
         return districtEntity;
     }
 }

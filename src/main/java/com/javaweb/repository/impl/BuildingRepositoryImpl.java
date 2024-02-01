@@ -89,14 +89,6 @@ public class BuildingRepositoryImpl implements BuildingRepository {
 			}
 		}
 
-		// Java 7
-//		if (typeCode != null && typeCode.size() != 0) {
-//			List<String> code = new ArrayList<>();
-//			for (String item : typeCode) {
-//				code.add("'" + item + "'");
-//			}
-//			where.append(" AND rt.code IN(" + String.join(",", code) + ") ");
-//		}
 
 		// Java 8
 		List<String> typeCode = buildingSearchBuilder.getTypeCode();

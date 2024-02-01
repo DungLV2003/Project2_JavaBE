@@ -14,26 +14,13 @@ public class BuildingEntity {
 	private String direction;
 	private String level;
 	private Integer rentPrice;
-	private String rentpricedescription;
+
 	private String serviceFee;
-	private String carFee;
-	private String motobikeFee;
-	private String overtimeFee;
-	private String waterFee;
-	private String electricityFee;
-	private String deposit;
+
 	private String payment;
-	private String rentTime;
-	private String decorationTime;
+
 	private Integer brokerageFee;
-	private String note;
-	private String linkOfBuilding;
-	private String map;
-	private String image;
-	private Date createdDate;
-	private Date modifiedDate;
-	private String createdBy;
-	private String modifiedBy;
+
 	private String managerName;
 	private String managerPhoneNumber;
 	
@@ -103,126 +90,21 @@ public class BuildingEntity {
 	public void setRentPrice(Integer rentPrice) {
 		this.rentPrice = rentPrice;
 	}
-	public String getRentpricedescription() {
-		return rentpricedescription;
-	}
-	public void setRentpricedescription(String rentpricedescription) {
-		this.rentpricedescription = rentpricedescription;
-	}
+
 	public String getServiceFee() {
 		return serviceFee;
 	}
 	public void setServiceFee(String serviceFee) {
 		this.serviceFee = serviceFee;
 	}
-	public String getCarFee() {
-		return carFee;
-	}
-	public void setCarFee(String carFee) {
-		this.carFee = carFee;
-	}
-	public String getMotobikeFee() {
-		return motobikeFee;
-	}
-	public void setMotobikeFee(String motobikeFee) {
-		this.motobikeFee = motobikeFee;
-	}
-	public String getOvertimeFee() {
-		return overtimeFee;
-	}
-	public void setOvertimeFee(String overtimeFee) {
-		this.overtimeFee = overtimeFee;
-	}
-	public String getWaterFee() {
-		return waterFee;
-	}
-	public void setWaterFee(String waterFee) {
-		this.waterFee = waterFee;
-	}
-	public String getElectricityFee() {
-		return electricityFee;
-	}
-	public void setElectricityFee(String electricityFee) {
-		this.electricityFee = electricityFee;
-	}
-	public String getDeposit() {
-		return deposit;
-	}
-	public void setDeposit(String deposit) {
-		this.deposit = deposit;
-	}
+	
 	public String getPayment() {
 		return payment;
 	}
 	public void setPayment(String payment) {
 		this.payment = payment;
 	}
-	public String getRentTime() {
-		return rentTime;
-	}
-	public void setRentTime(String rentTime) {
-		this.rentTime = rentTime;
-	}
-	public String getDecorationTime() {
-		return decorationTime;
-	}
-	public void setDecorationTime(String decorationTime) {
-		this.decorationTime = decorationTime;
-	}
-	public Integer getBrokerageFee() {
-		return brokerageFee;
-	}
-	public void setBrokerageFee(Integer brokerageFee) {
-		this.brokerageFee = brokerageFee;
-	}
-	public String getNote() {
-		return note;
-	}
-	public void setNote(String note) {
-		this.note = note;
-	}
-	public String getLinkOfBuilding() {
-		return linkOfBuilding;
-	}
-	public void setLinkOfBuilding(String linkOfBuilding) {
-		this.linkOfBuilding = linkOfBuilding;
-	}
-	public String getMap() {
-		return map;
-	}
-	public void setMap(String map) {
-		this.map = map;
-	}
-	public String getImage() {
-		return image;
-	}
-	public void setImage(String image) {
-		this.image = image;
-	}
-	public Date getCreatedDate() {
-		return createdDate;
-	}
-	public void setCreatedDate(Date createdDate) {
-		this.createdDate = createdDate;
-	}
-	public Date getModifiedDate() {
-		return modifiedDate;
-	}
-	public void setModifiedDate(Date modifiedDate) {
-		this.modifiedDate = modifiedDate;
-	}
-	public String getCreatedBy() {
-		return createdBy;
-	}
-	public void setCreatedBy(String createdBy) {
-		this.createdBy = createdBy;
-	}
-	public String getModifiedBy() {
-		return modifiedBy;
-	}
-	public void setModifiedBy(String modifiedBy) {
-		this.modifiedBy = modifiedBy;
-	}
+	
 	public String getManagerName() {
 		return managerName;
 	}
@@ -235,9 +117,10 @@ public class BuildingEntity {
 	public void setManagerPhoneNumber(String managerPhoneNumber) {
 		this.managerPhoneNumber = managerPhoneNumber;
 	}
-	
-	
-	
-	
-
+	public Integer getBrokerageFee() {
+		return brokerageFee;
+	}
+	public void setBrokerageFee(Integer brokerageFee) {
+		this.brokerageFee = brokerageFee;
+	}
 }
